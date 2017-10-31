@@ -1,0 +1,35 @@
+{
+  "name": "EatCleanMTL",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "body-parser": "~1.15.1",
+    "bootstrap-material-design": "^0.5.10",
+    "cookie-parser": "~1.4.3",
+    "cron": "latest",
+    "date-and-time": "^0.3.0",
+    "debug": "~2.2.0",
+    "easyxml": "^2.0.1",
+    "enum": "latest",
+    "express": "~4.13.4",
+    "iconv-lite": "latest",
+    "jade": "~1.11.0",
+    "jquery": "^3.1.1",
+    "json2csv": "^3.7.1",
+    "jsonschema": "^1.1.0",
+    "mongodb": "latest",
+    "morgan": "~1.7.0",
+    "nodemailer": "^2.6.4",
+    "raml2html": "^3.*",
+    "request": "latest",
+    "serve-favicon": "~2.3.0",
+    "twitter": "^1.4.0",
+    "winston": "latest",
+    "winston-daily-rotate-file": "latest",
+    "xml2js": "latest",
+    "yamljs": "^0.2.8"
+  }
+}

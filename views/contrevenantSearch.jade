@@ -1,0 +1,348 @@
+extends layout
+
+block head
+    link(rel='stylesheet', href='//cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.1.0/material.min.css')
+    link(rel='stylesheet', href='//cdn.datatables.net/1.10.12/css/dataTables.material.min.css')
+    link(rel='stylesheet', href='//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.min.css')
+    link(rel='stylesheet', href='//t00rk.github.io/bootstrap-material-datetimepicker/css/bootstrap-material-datetimepicker.css')
+
+block script
+    script(type='text/javascript', src='//cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js')
+    script(type='text/javascript', src='//cdn.datatables.net/1.10.12/js/dataTables.material.min.js')
+    script(type='text/javascript', src='//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.js')
+    script(type='text/javascript', src='//cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.4/js/standalone/selectize.js')
+    script(type='text/javascript', src='//momentjs.com/downloads/moment-with-locales.min.js')
+    script(type='text/javascript', src='//t00rk.github.io/bootstrap-material-datetimepicker/js/bootstrap-material-datetimepicker.js')
+
+block content
+    .container
+        .row-fluid
+            .jumbotron.text-center
+                h1.text-white(style='')= title
+                p
+                    | Veuillez sélectionner un mode de recherche
+        .row
+            .col-xs-12.col-sm-6.col-md-6.col-lg-6
+                .panel.panel-default
+                    .panel-heading(id='rechercherEtablissement')
+                        h3.panel-title
+                            a(role='button')
+                                span.glyphicon.glyphicon-option-vertical(aria-hidden='true')
+                                | Recherche par établissement
+                    .panel-body.hider(style="")
+                        .form-group
+                            select(id="proprietaireSelect", data-placeholder="Selectionez un établissement...", class="form-control chosen-select")
+                                option(value='', hidden="hidden") Selectionez un établissement
+                                for item in proprietaires
+                                    option #{item}
+            .col-xs-12.col-sm-6.col-md-6.col-lg-6
+                .panel.panel-default
+                    .panel-heading(id='rechercherDate')
+                        h3.panel-title
+                            a(role='button')
+                                span.glyphicon.glyphicon-option-vertical(aria-hidden='true')
+                                | Recherche entre deux dates
+                    .panel-body.hider(style="display:none;")
+                        //div(class="input-daterange form-group", id="datepicker")
+                        .form-group.label-static
+                            label.control-label(for='du') Date de début
+                            input(id="du", type="text", name="du", placeholder="2016-01-01", class="input-date form-control")
+                        .form-group.label-static
+                            label.control-label(for='au') Date de fin
+                            input(id="au", type="text", name="au", placeholder="2016-06-01", class="input-date form-control")
+                        button.btn.btn-raised.btn-primary(id="btnDateSearch") Recherche
+        .row-fluid
+            div(class="well table-responsive")
+                table(id="searchResult", class="table table-hover table-condensed")
+                    thead
+                        tr: th id
+                            th Propriétaire
+                            th Catégorie
+                            th Établissement
+                            th Adresse
+                            th Ville
+                            th Description
+                            th Date infraction
+                            th Date jugement
+                            th Montant
+                            th Options
+                    tbody
+
+    #modifModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
+        .modal-dialog(role='document')
+            .modal-content
+                .modal-header
+                    button.close(type='button', data-dismiss='modal', aria-label='Close')
+                        span(aria-hidden='true') ×
+                    h4#myModalLabel.modal-title Modifier Contrevenant
+                .modal-body
+                    .form-group.row
+                        label.col-xs-3.col-form-label Propriétaire
+                        .col-xs-9
+                            input#proprietaire-text-input.form-control(type='text')
+                    .form-group.row
+                        label.col-xs-3.col-form-label Catégorie
+                        .col-xs-9
+                            input#categorie-text-input.form-control(type='text')
+                    .form-group.row
+                        label.col-xs-3.col-form-label Établissement
+                        .col-xs-9
+                            input#etablissement-text-input.form-control(type='text')
+                    .form-group.row
+                        label.col-xs-3.col-form-label Adresse
+                        .col-xs-9
+                            input#adresse-text-input.form-control(type='text')
+                    .form-group.row
+                        label.col-xs-3.col-form-label Ville
+                        .col-xs-9
+                            input#ville-text-input.form-control(type='text')
+                    .form-group.row
+                        label.col-xs-3.col-form-label Description
+                        .col-xs-9
+                            input#description-text-input.form-control(type='text')
+                    .form-group.row
+                        label.col-xs-3.col-form-label Date infraction
+                        .col-xs-9
+                            input#date-infraction-text-input.input-date.form-control(type='text')
+                    .form-group.row
+                        label.col-xs-3.col-form-label Date jugement
+                        .col-xs-9
+                            input#date-jugement-text-input.input-date.form-control(type='text')
+                    .form-group.row
+                        label.col-xs-3.col-form-label Montant $
+                        .col-xs-3
+                            input#montant-number-input.form-control(type='number')
+                .modal-footer
+                    button.btn.btn-raised.btn-success(id='btnSave', type='button', data-dismiss='modal', data-id='') Savegarder
+
+block javascript
+    script.
+        $(document).ready(function () {
+            $('#searchResult').DataTable({
+                "columnDefs": [
+                    {
+                        "targets": [0],
+                        "visible": false,
+                        "searchable": true
+                    },
+                ],
+                'fnCreatedRow': function (nRow, aData, iDataIndex) {
+                    $(nRow).attr('id', aData[0]); // or whatever you choose to set as the id
+                },
+                "language": {
+                    "url": "json/French.json"
+                },
+            });
+
+            $('.chosen-select').selectize({
+                plugins: ['restore_on_backspace'],
+                persist: false,
+                sortField: 'text'
+            });
+
+            $('.input-date').bootstrapMaterialDatePicker({
+                format: 'YYYY-MM-DD',
+                lang: 'fr',
+                time: false
+            });
+
+            $('#rechercherDate').click(function () {
+                toggleSearchMode($(this));
+            });
+
+            $('#rechercherEtablissement').click(function () {
+                toggleSearchMode($(this));
+            });
+
+            $("#btnDateSearch").click(function (e) {
+                var url = "/api/search/contrevenants/date";
+
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    data: {"du": $("#du").val(), "au": $("#au").val()},
+                    success: function (data) {
+                        updateTable(data);
+                    },
+                    statusCode: {
+                        404: function () {
+                            alert("Erreur lors de la selection des dates");
+                        }
+                    }
+                });
+            });
+
+            $('#proprietaireSelect').on('change', function () {
+                var url = "/api/search/contrevenants/nom";
+
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    data: {"nom": $(this).val()},
+                    success: function (data) {
+                        updateTable(data);
+                    },
+                    statusCode: {
+                        404: function () {
+                            alert("Erreur lors du chargement du contreventant.");
+                        }
+                    }
+                });
+            });
+
+            $('#modifModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var recipient = button.attr('data-id');
+                var url = '/api/search/contrevenants/id';
+
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    data: {"id": recipient},
+                    success: function (data) {
+                        $('#proprietaire-text-input').val(data[0]['proprietaire']);
+                        $('#categorie-text-input').val(data[0]['categorie']);
+                        $('#etablissement-text-input').val(data[0]['etablissement']);
+                        $('#adresse-text-input').val(data[0]['adresse']);
+                        $('#ville-text-input').val(data[0]['ville']);
+                        $('#description-text-input').val(data[0]['description']);
+                        $('#date-infraction-text-input').val(data[0]['date_infraction'].slice(0, 10));
+                        $('#date-jugement-text-input').val(data[0]['date_jugement'].slice(0, 10));
+                        $('#montant-number-input').val(parseInt(data[0]['montant']));
+                    },
+                    statusCode: {
+                        404: function () {
+                            alert("Erreur lors du chargement du contrevenant.");
+                        }
+                    }
+                });
+
+                $('#btnSave').attr('data-id', button.data('id'));
+            });
+        });
+
+        $('#btnSave').click(function () {
+            //todo: get fields to modify and send the data to ajaxMod
+            var data = {};
+            data['proprietaire'] = $('#proprietaire-text-input').val();
+            data['categorie'] = $('#categorie-text-input').val();
+            data['etablissement'] = $('#etablissement-text-input').val();
+            data['adresse'] = $('#adresse-text-input').val();
+            data['ville'] = $('#ville-text-input').val();
+            data['description'] = $('#description-text-input').val();
+            data['date_infraction'] = $('#date-infraction-text-input').val();
+            data['date_jugement'] = $('#date-jugement-text-input').val();
+            data['montant'] = $('#montant-number-input').val();
+            ajaxMod($(this).attr('data-id'), data);
+        });
+
+        function toggleSearchMode(elem) {
+            var div = $(elem).closest(".panel").find(".hider");
+            if (!div.is(":visible")) {
+                $('.hider').toggle();
+            }
+        }
+
+        function getOptions(id) {
+            return getDeleteOption(id) + getModOption(id);
+        }
+
+        function getDeleteOption(id) {
+            return "<button class='btn btn-sm btn-raised btn-danger delete col-xs-12' data-id='" + id + "'>Suprimmer</button>"
+        }
+        function getModOption(id) {
+            return "<button class='btn btn-sm btn-raised btn-warning mod col-xs-12' data-target='#modifModal' data-toggle='modal' data-id='" + id + "'>Modifier</button>"
+        }
+
+        function addListeners() {
+            $('body').on('click', '.delete',function () {
+                var id = $(this).data('id');
+                ajaxDelete(id, $(this));
+            });
+        }
+
+        function ajaxMod(id, contrevenantData) {
+            var url = "/contrevenant/" + id;
+            $.ajax({
+                type: "PUT",
+                data: JSON.stringify(contrevenantData),
+                contentType: "application/json",
+                url: url,
+                success: function (data) {
+                    var table = $('#searchResult').DataTable();
+                    var row = $('#' + id);
+                    table
+                        .row(row)
+                        .data([
+                            id,
+                            data["proprietaire"],
+                            data["categorie"],
+                            data["etablissement"],
+                            data["adresse"],
+                            data["ville"],
+                            data["description"],
+                            data["date_infraction"].slice(0, 10),
+                            data["date_jugement"].slice(0, 10),
+                            data["montant"],
+                            getOptions(id)
+                        ])
+                        .draw();
+                },
+                statusCode: {
+                    404: function () {
+                        alert("Erreur");
+                    },
+                    200: function () {
+                        alert("Contrevenant modifié");
+                    }
+                }
+            });
+        }
+
+        function ajaxDelete(id, caller) {
+            var url = "/contrevenant/" + id;
+
+            $.ajax({
+                type: "DELETE",
+                url: url,
+                success: function (data) {
+                    var table = $('#searchResult').DataTable();
+                    table
+                        .row(caller.parents('tr'))
+                        .remove()
+                        .draw();
+                },
+                statusCode: {
+                    404: function () {
+                        alert("Erreur");
+                    },
+                    200: function () {
+                        alert("Supprimé");
+                    }
+                }
+            });
+        }
+
+        function updateTable(data) {
+            var table = $('#searchResult').DataTable();
+
+            table.clear().draw();
+            for (var i = 0; i < data.length; ++i) {
+                table.row.add(
+                    [
+                        data[i]["_id"],
+                        data[i]["proprietaire"],
+                        data[i]["categorie"],
+                        data[i]["etablissement"],
+                        data[i]["adresse"],
+                        data[i]["ville"],
+                        data[i]["description"],
+                        data[i]["date_infraction"].slice(0, 10),
+                        data[i]["date_jugement"].slice(0, 10),
+                        data[i]["montant"],
+                        getOptions(data[i]["_id"])
+                    ]
+                ).draw(false);
+            }
+            addListeners();
+        }

@@ -1,0 +1,32 @@
+{
+  "id": {
+    "type": "string"
+  },
+  "proprietaire": {
+    "type": "string"
+  },
+  "categorie": {
+    "type": "string"
+  },
+  "etablissement": {
+    "type": "string"
+  },
+  "adresse": {
+    "type": "string"
+  },
+  "ville": {
+    "type": "string"
+  },
+  "description": {
+    "type": "string"
+  },
+  "date_infraction": {
+    "type": "string"
+  },
+  "date_jugement": {
+    "type": "string"
+  },
+  "montant": {
+    "type": "string"
+  }
+}

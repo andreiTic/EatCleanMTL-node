@@ -1,0 +1,50 @@
+doctype html
+html
+    head
+        title= title
+        meta(charset='utf-8')
+        meta(http-equiv='X-UA-Compatible', content='IE=edge')
+        meta(name='viewport', content='width=device-width, initial-scale=1')
+
+        link(rel='stylesheet', href='stylesheets/style.css')
+        link(rel='stylesheet', type="text/css", href='//fonts.googleapis.com/css?family=Roboto:300,400,500,700')
+        link(rel='stylesheet', type="text/css", href='//fonts.googleapis.com/icon?family=Material+Icons')
+        link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css',
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u", crossorigin="anonymous")
+        link(rel='stylesheet', href='/assets/vendor/bootstrap-material-design/dist/css/bootstrap-material-design.css')
+        link(rel='stylesheet', href='/assets/vendor/bootstrap-material-design/dist/css/ripples.css')
+
+        block head
+
+    nav#topnav.navbar.navbar-default(role='navigation')
+        .container
+            .navbar-header
+                button.navbar-toggle(type='button', data-toggle='collapse', data-target='.navbar-ex1-collapse')
+                    span.sr-only Toggle navigation
+                    span.icon-bar
+                    span.icon-bar
+                    span.icon-bar
+                a.navbar-brand(href='/') EatCleanMTL
+            .collapse.navbar-collapse.navbar-ex1-collapse
+                ul.nav.navbar-nav.navbar-right
+                    li
+                        a.scroll(href='https://twitter.com/EatCleanMTL') TWITTER
+                    li
+                        a.scroll(href='/') RECHERCHE
+                    li
+                        a.scroll(href='/subscribe') S'ABONNER
+                    li
+                        a.scroll(href='/doc') DOC
+
+    body
+        block content
+        script(type='text/javascript', src='//code.jquery.com/jquery-3.1.1.min.js')
+        script(type='text/javascript', src='//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js')
+        script(type='text/javascript', src='/assets/vendor/bootstrap-material-design/dist/js/ripples.min.js')
+        script(type='text/javascript', src='/assets/vendor/bootstrap-material-design/dist/js/material.min.js')
+        script.
+            $(document).ready(function () {
+                $.material.init()
+            });
+        block script
+        block javascript

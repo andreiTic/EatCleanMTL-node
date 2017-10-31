@@ -1,0 +1,270 @@
+#%RAML 0.8
+---
+title: Service Rest
+version: v1
+baseUri: https://localhost:3000/
+mediaType: application/json
+resourceTypes:
+  - base:
+      get?: &common
+        headers:
+        responses:
+          403:
+            description: |
+              Une erreur c'est produite.
+      post?: *common
+      patch?: *common
+      put?: *common
+      delete?: *common
+  - item:
+      type: base
+      get?:
+      post?:
+      patch?:
+      put?:
+      delete?:
+        responses:
+          204:
+            description: Item removed.
+  - collection:
+      type: base
+      get?:
+      post?:
+# Contrevenants
+/api/search:
+  /contrevenant/date:
+    type: collection
+    get:
+      description: Le système offre un service REST permettant d'obtenir la liste des contrevenants ayant commis une
+                   infraction entre deux dates spécifiées en paramètre. Les dates sont spécifiées selon le format ISO 8601.
+                   Les données retournées sont en format JSON.
+      queryParameters:
+        du:
+          description: |
+            La date de debut.
+            Ex: 2016-05-08
+          type: string
+          required: true
+        au:
+          description: |
+            La date de fin.
+            Ex: 2016-05-15
+          type: string
+          required: true
+      responses:
+        200:
+          body:
+            schema: !include ../modules/schemas/contrevenants.json
+            example: !include ../modules/schemas/contrevenantsExemple.json
+  /contrevenant/nom:
+      type: collection
+      get:
+        description: Le système offre un service REST permettant d'obtenir la liste des contrevenants ayant commis une
+                     infraction par nom spécifiées en paramètre. Les données retournées sont en format JSON.
+        queryParameters:
+          nom:
+            description: |
+              Le nom d'établissement recherché
+              Ex: UQAM
+            type: string
+            required: true
+        responses:
+          200:
+            body:
+              schema: !include ../modules/schemas/contrevenants.json
+              example: !include ../modules/schemas/contrevenantsExemple.json
+  /contrevenant/id:
+        type: collection
+        get:
+          description: Le système offre un service REST permettant d'obtenir la liste des contrevenants ayant commis une
+                       infraction un ID spécifiée en paramètre. Les données retournées sont en format JSON.
+          queryParameters:
+            ID:
+              description: |
+                Le ID d'établissement recherché
+                Ex: 57f04562bccd53449dc59e6b
+              type: string
+              required: true
+          responses:
+            200:
+              body:
+                schema: !include ../modules/schemas/contrevenants.json
+                example: !include ../modules/schemas/contrevenantsExemple.json
+  /contrevenants/list/:format:
+          type: collection
+          get:
+            description: Le système offre un service REST permettant d'obtenir la liste de tous les contrevenants, en ordre décroissant,
+                         ayant commis une infraction. Les données retournées sont en format JSON, XML ou CSV selon le paramètre spécifié.
+            queryParameters:
+              JSON:
+                description: |
+                  Le format de routour de la liste des contrevenants en JSON
+                  Ex: JSON
+                type: string
+                required: true
+              CSV:
+                  description: |
+                    Le format de routour de la liste des contrevenants en CSV
+                    Ex: CSV
+                  type: string
+                  required: true
+              XML:
+                description: |
+                  Le format de routour de la liste des contrevenants en XML
+                  Ex: XML
+                type: string
+                required: true
+            responses:
+              200:
+                body:
+                  application/json:
+                    schema: !include ../modules/schemas/contrevenants.json
+                    example:  !include ../modules/schemas/contrevenantsExemple.json
+                  application/xml:
+                     schema: !include ../modules/schemas/xmlSchemas.xml
+                     example:  !include ../modules/schemas/contrevenant.xml
+                  application/csv:
+                    example:  !include ../modules/schemas/csv.txt
+              400:
+                description: |
+                  Requête incorrecte.
+/contrevenant:
+    /:id:
+        type: collection
+        put:
+          description: Le système offre un service REST permettant de modifier un contrevenant ayant commis une
+                       infraction par un ID spécifiée en paramètre. Les données sont envoyées en format JSON.
+          body:
+            example: !include ../modules/schemas/contrevenants.json
+          queryParameters:
+            id:
+              description: |
+                Le ID du contrevenant à modifier
+                Ex: 57f04562bccd53449dc59e6b
+              type: string
+              required: true
+
+          responses:
+            200:
+              body:
+                example: |
+                    {
+                       "proprietaire":"9176-5800 QUEBEC INC.",
+                       "categorie":"Restaurant",
+                       "etablissement":"3 AMIGO",
+                       "adresse":"1621 Rue Saint-Denis ",
+                       "ville":"Montréal H2X 3K3",
+                       "description":"Les lieux, véhicules, équipements, matériaux et ustensiles servant à la préparation au conditionnement, à l'entreposage, au transport, à l'étiquetage et au service des produits, ainsi que les autres installations et locaux sanitaires, doivent être propres.",
+                       "date_infraction":"2014-03-18T00:00:00.000Z",
+                       "date_jugement":"2015-06-19T00:00:00.000Z",
+                       "montant":"9"
+                    }
+            400:
+              description: |
+                Requête incorrecte.
+            404:
+              description: |
+                Non trouvé.
+            500:
+              description: |
+                Erreur serveur.
+        delete:
+          description: Le système offre un service REST permettant de supprimer un contrevenant ayant commis une
+                       infraction par un ID spécifiée en paramètre.
+          queryParameters:
+            id:
+              description: |
+                Le ID du contrevenant à modifier
+                Ex: 57f04562bccd53449dc59e6b
+              type: string
+              required: true
+
+          responses:
+            200:
+             description: |
+                Requête correcte.
+            404:
+              description: |
+                Non trouvé.
+/subscriber:
+    type: collection
+    post:
+       description: Le système offre un service REST permettant de s'abonner à la liste de courriels des nouveaux contrevenants,
+                    le service reçois un fichier JSON contenant le nom, l'adresse courriel et la liste des contrevenants à surveiller.
+       body:
+          example: |
+              [
+                {
+                  type: "object",
+                  additionalProperties: false,
+                  properties: {
+                       nom: {
+                           type: "string",
+                           required: true
+                       },
+                       email: {
+                           type: "string",
+                           required: true
+                       },
+                       listeContrevenants: {
+                           type: "array",
+                           required: true,
+                           items: {
+                               type: "string"
+                           }
+                       }
+                   }
+                }
+                {
+                  "nom":"Alexandre Jean",
+                  "email":"alexandre_jean@email.com",
+                  "listeContrevenants":["BONIZZA+PIZZERIA+BONIZZA","RESTAURANT+NGUN+SHING","RESTAURANT+FUNG+SHING"]"
+                }
+              ]
+       responses:
+         200:
+            description: Opération réussie.
+    /:id:
+      type: collection
+      delete:
+         description: Le système offre un service REST permettant de se désabonner à la liste de courriels des nouveaux contrevenants,
+                      le service reçois dans l'URL le ID du compte à supprimer.
+         body:
+           example: |
+               [
+                 {
+                   type: "object",
+                   additionalProperties: false,
+                   properties: {
+                        nom: {
+                            type: "string",
+                            required: true
+                        },
+                        email: {
+                            type: "string",
+                            required: true
+                        },
+                        listeContrevenants: {
+                            type: "array",
+                            required: true,
+                            items: {
+                                type: "string"
+                            }
+                        }
+                    }
+                 }
+               ]
+         queryParameters:
+           id:
+             description: |
+               Le ID du compte à supprimer.
+               Ex: 57f04562bccd53449dc59e6b
+             type: string
+             required: true
+
+         responses:
+           200:
+             description: Opération réussie.
+           404:
+               description: |
+                 Non trouvé.

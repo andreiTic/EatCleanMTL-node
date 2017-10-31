@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Etablissement>
+    <Etablissement>
+        <Infractions>18</Infractions>
+        <Nom>SUPER MARCHE TROPIC</Nom>
+    </Etablissement>
+    <Etablissement>
+        <Infractions>18</Infractions>
+        <Nom>SAINT-JEAN BAGEL</Nom>
+    </Etablissement>
+    <Etablissement>
+        <Infractions>16</Infractions>
+        <Nom>RESTAURANT ETHAN</Nom>
+    </Etablissement>
+ </Etablissement>

@@ -1,0 +1,72 @@
+extends layout
+block head
+    link(rel='stylesheet', href='//cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.1.0/material.min.css')
+
+block script
+    script(type='text/javascript', src='//cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.4/js/standalone/selectize.js')
+    script(type='text/javascript', src='//momentjs.com/downloads/moment-with-locales.min.js')
+block content
+    .container
+        .well
+            .h1 S'abonner aux nouveaux contrevenants.
+            br
+            br
+            .form-group.label-floating
+                label.control-label(for='input-name') Nom
+                input#input-name.form-control(type='text', required='')
+            .form-group.label-floating
+                label.control-label(for='input-email') Courriel
+                input#input-email.form-control(type='email', required='')
+            select(id="proprietaireSelect", multiple="multiple" data-placeholder="Selectionez un établissement...", class="form-control chosen-select", required='true')
+                option(value='', hidden="hidden") Selectionez un établissement
+                for item in proprietaires
+                    option #{item}
+            button.btn.btn-primary.btn-raised#btn-send Confirmer
+
+block javascript
+    script.
+        $(document).ready(function () {
+            $('.chosen-select').selectize({
+                plugins: ['restore_on_backspace', 'remove_button'],
+                delimiter: ',',
+                persist: false,
+                create: function (input) {
+                    return {
+                        value: input,
+                        text: input
+                    }
+                }
+            });
+
+            $('#btn-send').on('click', function () {
+                var data = {};
+                if ($('#input-name').val() == '' || $('#input-email').val() == '') {
+                    alert('Erreur : Champs vides');
+                    return;
+                }
+                data['nom'] = $('#input-name').val();
+                data['email'] = $('#input-email').val();
+                data['listeContrevenants'] = $.map(
+                    $('#proprietaireSelect').find('option'),
+                    function (option) {
+                        return option.value;
+                    }
+                );
+
+                var url = '/subscriber';
+                $.ajax({
+                    type: "POST",
+                    data: {surveillant: JSON.stringify(data)},
+                    url: url,
+                    statusCode: {
+                        304: function () {
+                            alert("Le courriel est déjà abonné");
+                        },
+                        200: function () {
+                            alert("Courriel enregistré");
+                            location.href = '/';
+                        }
+                    }
+                });
+            });
+        });

@@ -1,0 +1,8 @@
+enabled: false
+service: gmail
+username:
+password:
+emailSubject: Liste des nouveaux contrevenants
+
+emailList:
+  - example@mail.com

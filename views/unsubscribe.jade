@@ -1,0 +1,35 @@
+extends layout
+
+block head
+    link(rel='stylesheet', href='//cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.1.0/material.min.css')
+
+block content
+    .container
+        .well
+            h1 Confirmer?
+            button.btn.btn-danger.btn-raised#btn-send(data-id= subscriberId) Confirmer
+
+block javascript
+    script.
+        $(document).ready(function () {
+            $('#btn-send').on('click', function () {
+                var id = $(this).attr('data-id');
+                var url = '/subscriber/'+id;
+                $.ajax({
+                    type: "DELETE",
+                    data: {id:id},
+                    url: url,
+                    statusCode: {
+                        404: function(){
+                            alert("E-mail déjà désaboné");
+                        },
+                        200: function(){
+                            alert("E-mail désaboné");
+                        },
+                        500: function () {
+                            alert("Erreur interne: ID invalide");
+                        }
+                    }
+                })
+            });
+        });
